@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const fs = require('fs');
-const {pool} = require('../config/connect');
+
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -24,18 +24,6 @@ router.post('/', upload.single('image'), (req, res) => {
     } else {
       console.log('File saved successfully');
       //saving upload path to db
-      const query = 'INSERT INTO fileinfo (filename, path) VALUES (?, ?)';
-      const values = [fileName, uploadPath];
-  return new Promise((resolve,reject)=>{
-    pool.query(query, values, (err, result) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-      //console.log('File saved to database',result);
-      res.json('file uploaded and path saved to db');
-    });
-  });
       
     }
   });
