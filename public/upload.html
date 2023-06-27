@@ -134,23 +134,23 @@
           var xhr = new XMLHttpRequest();
 
           // Progress event handler
-  // Progress event handler
-          xhr.upload.addEventListener("progress", function (event) {
+   xhr.upload.addEventListener("progress", function (event) {
             if (event.lengthComputable) {
-              var percentComplete = (event.loaded / event.total) * 100;
-              setInterval(() => {
-                $("#progress-bar").css("width", percentComplete + "%");
-              }, 2000);
+              var percentComplete = Math.floor(
+                (event.loaded / event.total) * 100
+              );
+
+              $("#progress-bar").css("width", percentComplete + "%");
+
               // Check if progress is 100%
               if (percentComplete === 100) {
                 // Hide crop preview, buttons, forms, and image selection area
-                setInterval(() => {
-                  $(
-                    " #upload-button, form, #image-preview, .imgareaselect-selection"
-                  ).hide("slow", () => {
-                    $("#showCompletion").show("slow");
-                  });
-                }, 3000);
+
+                $(
+                  " #upload-button, form, #image-preview, .imgareaselect-selection"
+                ).hide("slow", () => {
+                  $("#showCompletion").show("slow");
+                });
               }
             }
           });
