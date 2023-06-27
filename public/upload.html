@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image Cropping</title>
+    <style></style>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="card-element">
+      <form>
+        <input
+          type="file"
+          id="image-upload"
+          name="file"
+          accept="image/png, image/jpeg"
+        />
+        <br />
+      </form>
+
+      <div id="ImageDisplay" style="overflow: visible">
+        <img id="image-preview" src="" />
+        <br />
+      </div>
+      <img id="cropped-preview" src="" />
+      <br />
+      <button id="upload-button">Upload</button>
+      <div id="progress-bar"></div>
+      <div id="showCompletion">Cropped Image was uploaded successfully!</div>
+    </div>
+    <div id="nanobar"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/imgareaselect-master/jquery.imgareaselect.dev.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        var croppedImage;
+        var fileName;
+        $("#image-upload").on("change", function (event) {
+          var file = event.target.files[0];
+          var file_name = file.name; // Retrieve the file name
+          //console.log(file_name);
+          //const eventLog = document.querySelector(".event-log-contents");
+          var reader = new FileReader();
+          //var progresspercentage = "";
+          //   //function handleprogress(event) {
+          //     const loadedvar = event.loaded;
+          //     const totalvar = event.total;
+          //     progresspercentage = Math.floor((loadedvar / totalvar) * 100);
+          //     eventLog.textContent += `${event.type}: ${progresspercentage} percent transferred\n`;
+          //   }
+          //use imageareaselect-master for cropping image,download and link it
+          //reader.addEventListener("progress", handleprogress);
+          reader.onload = function (e) {
+            $("#image-preview")
+              .attr("src", e.target.result)
+              .on("load", function () {
+                $('input[type="file"]').hide("slow", () => {
+                  $(this).imgAreaSelect({
+                    aspectRatio: "1:1", // for square cropping
+                    onSelectChange: function (img, selection) {
+                      $(".imgareaselect-selection").css({
+                        outline: "1px dashed #ff0000 imprtant!",
+                        outlineOffset: "-1px",
+                        overflow: "visible",
+                      });
+                    },
+                    onSelectEnd: function (img, selection) {
+                      var scaleX = img.naturalWidth / img.width;
+                      var scaleY = img.naturalHeight / img.height;
+
+                      // Calculate the actual crop coordinates based on the selection
+                      var x1 = Math.round(selection.x1 * scaleX);
+                      var y1 = Math.round(selection.y1 * scaleY);
+                      var width = Math.round(selection.width * scaleX);
+                      var height = Math.round(selection.height * scaleY);
+
+                      // Create a new canvas element to draw the cropped image
+                      var canvas = document.createElement("canvas");
+                      canvas.width = width;
+                      canvas.height = height;
+                      var ctx = canvas.getContext("2d");
+                      ctx.drawImage(
+                        img,
+                        x1,
+                        y1,
+                        width,
+                        height,
+                        0,
+                        0,
+                        width,
+                        height
+                      );
+
+                      // Set the cropped image as the source of the preview image
+                      $("#cropped-preview").attr(
+                        "src",
+                        canvas.toDataURL("image/png")
+                      );
+                      const progressBar =
+                        document.getElementById("progress-bar");
+                      const croppedPreview =
+                        document.getElementById("cropped-preview");
+
+                      croppedPreview.addEventListener("load", function () {
+                        progressBar.style.maxWidth =
+                          croppedPreview.offsetWidth + "px";
+                      });
+                      // Store the cropped image data
+                      croppedImage = canvas.toDataURL("image/png");
+                      fileName = file_name;
+                    },
+                  });
+                });
+              });
+          };
+
+          reader.readAsDataURL(file);
+        });
+
+        $("#upload-button").on("click", function () {
+          if (!croppedImage) {
+            alert("No image has been cropped.");
+            return;
+          }
+
+          // Convert data URI to Blob
+          const blob = dataURItoBlob(croppedImage);
+
+          // Create a FormData object
+          const formData = new FormData();
+          formData.append("image", blob, fileName);
+
+          var xhr = new XMLHttpRequest();
+
+          // Progress event handler
+          xhr.upload.addEventListener("progress", function (event) {
+            if (event.lengthComputable) {
+              var percentComplete = (event.loaded / event.total) * 100;
+              setInterval(() => {
+                $("#progress-bar").css("width", percentComplete + "%");
+              }, 2000);
+              // Check if progress is 100%
+              if (percentComplete === 100) {
+                // Hide crop preview, buttons, forms, and image selection area
+                setInterval(() => {
+                  $(
+                    " #upload-button, form, #image-preview, .imgareaselect-selection"
+                  ).hide("slow", () => {
+                    $("#showCompletion").show("slow");
+                  });
+                }, 3000);
+              }
+            }
+          });
+
+          // Error event handler
+          xhr.addEventListener("error", function () {
+            // File upload failed
+            alert("Error uploading file.");
+            $("#progress-bar").css("width", "0%");
+          });
+
+          // Open a POST request to the server
+          xhr.open("POST", "/upload");
+
+          // Send the request with the form data
+          xhr.send(formData);
+        });
+
+        // Helper function to convert data URI to Blob
+        function dataURItoBlob(dataURI) {
+          const byteString = atob(dataURI.split(",")[1]);
+          const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+          const ab = new ArrayBuffer(byteString.length);
+          const ia = new Uint8Array(ab);
+          for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+          }
+          return new Blob([ab], { type: mimeString });
+        }
+      });
+    </script>
+  </body>
+</html>

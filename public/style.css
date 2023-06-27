@@ -1,0 +1,81 @@
+    body{
+        margin: 10px;
+        background-color: #FCF9F8;
+    }
+    div {
+      overflow: visible !important;
+    }
+    #card-element {
+        display: inline-block;
+        width: 35%;
+        margin-top: 5%;
+        margin-left: 20%;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #6a86ab;
+      }
+      
+      
+      
+      #card-element button {
+        width: 100%;
+        padding: 20px;
+        background-color: #6B003D;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-weight: bold;
+      }
+      
+      #card-element button:hover {
+        background-color: #0F65D6;
+      }
+      
+      
+      p {
+        font-family: cursive;
+        font-style: italic;
+        font-size: 18px;
+      }
+      #image-preview {
+        max-width: 100%;
+        max-height: 100%;
+        cursor: crosshair;
+      }
+
+      #cropped-preview {
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      .imgareaselect-selection {
+        border: 1px solid #460303;
+        border-radius: 5px;
+      }
+      #progress-bar {
+        width: 0%;
+        height: 20px;
+        color: #fff !important;
+        background-color: #537192;
+        border-radius: 15px;
+        box-shadow: 1px 2px #537192;
+        transition: width 0.3s ease-in-out;
+      }
+      #progress-bar ::before {
+        border-color: white;
+      }
+      #showCompletion {
+        display: none;
+      }
+      label {
+        display: block;
+        font: 1rem "Fira Sans", sans-serif;
+      }
+
+      input,
+      label {
+        margin: 0.4rem 0;
+      }
