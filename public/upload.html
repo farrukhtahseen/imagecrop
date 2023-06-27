@@ -134,25 +134,48 @@
           var xhr = new XMLHttpRequest();
 
           // Progress event handler
-          xhr.upload.addEventListener("progress", function (event) {
-            if (event.lengthComputable) {
-              var percentComplete = (event.loaded / event.total) * 100;
-              setInterval(() => {
-                $("#progress-bar").css("width", percentComplete + "%");
-              }, 2000);
-              // Check if progress is 100%
-              if (percentComplete === 100) {
-                // Hide crop preview, buttons, forms, and image selection area
-                setInterval(() => {
-                  $(
-                    " #upload-button, form, #image-preview, .imgareaselect-selection"
-                  ).hide("slow", () => {
-                    $("#showCompletion").show("slow");
-                  });
-                }, 3000);
-              }
-            }
+          // Progress event handler
+xhr.upload.addEventListener("progress", function (event) {
+  if (event.lengthComputable) {
+    var percentComplete = (event.loaded / event.total) * 100;
+
+    // Calculate the direction of the progress (forward or backward)
+    var direction = percentComplete < 50 ? 1 : -1;
+
+    // Start the animation interval
+    var interval = setInterval(() => {
+      // Increase or decrease the progress bar width based on the direction
+      percentComplete += direction;
+
+      // Update the progress bar width
+      $("#progress-bar").css("width", percentComplete + "%");
+
+      // Check if progress is 100% or 0%
+      if (percentComplete === 100 || percentComplete === 0) {
+        // Stop the animation interval
+        clearInterval(interval);
+
+        // Hide or show elements based on progress completion
+        if (percentComplete === 100) {
+          // Hide crop preview, buttons, forms, and image selection area
+          $(
+            "#upload-button, form, #image-preview, .imgareaselect-selection"
+          ).hide("slow", () => {
+            $("#showCompletion").show("slow");
           });
+        } else {
+          // Show crop preview, buttons, forms, and image selection area
+          $(
+            "#upload-button, form, #image-preview, .imgareaselect-selection"
+          ).show("slow", () => {
+            $("#showCompletion").hide("slow");
+          });
+        }
+      }
+    }, 20); // Adjust the interval duration as needed for smoother animation
+  }
+});
+
 
           // Error event handler
           xhr.addEventListener("error", function () {
