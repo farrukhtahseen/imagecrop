@@ -23,7 +23,7 @@ router.post('/', upload.single('image'), (req, res) => {
       res.status(500).json({ error: 'Could not upload' });
     } else {
       console.log('File saved successfully');
-      //saving upload path to db
+      console.log(uploadPath);
       
     }
   });
