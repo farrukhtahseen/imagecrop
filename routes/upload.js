@@ -12,7 +12,7 @@ router.post('/', upload.single('image'), (req, res) => {
   }
   //return console.log(req.file);
   const fileName = req.file.originalname;
-  //return console.log(fileName);
+  return console.log(fileName);
   const fileContent = fs.readFileSync(req.file.path);
   
 
